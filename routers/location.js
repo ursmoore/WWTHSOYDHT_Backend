@@ -62,4 +62,31 @@ router.post("/locations", authMiddleware, async (req, res) => {
   return res.status(200).send({ newPost });
 });
 
+//POST COMMENT
+router.post("/comment", authMiddleware, async (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const { userId } = toData(authHeader.replace("Bearer ", ""));
+  try {
+    const oneUser = await User.findByPk(userId);
+
+    // get request body
+    const { text, locationId } = req.body;
+    if (!oneUser || !text) {
+      return res.status(400).send("No user or comment provided");
+    }
+
+    // Go to DB and create new comment with params
+    const newComment = await Comment.create({
+      text,
+      userId,
+      locationId,
+      userName: oneUser.name,
+    });
+    // Send new user back
+    res.send(newComment);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
 module.exports = router;
