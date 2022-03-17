@@ -26,7 +26,7 @@ module.exports = {
           description: "France is alright place",
           latitude: 48.8584,
           longtitude: 2.2945,
-          experience: "There was this guy that attacked us with bag3uete",
+          experience: "There was this guy that attacked us with baguete",
           createdAt: new Date(),
           updatedAt: new Date(),
           userId: 3,

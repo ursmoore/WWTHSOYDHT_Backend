@@ -8,7 +8,7 @@ const router = new Router();
 
 router.get("/locations", async (req, res) => {
   try {
-    const allLocation = await Location.findAll();
+    const allLocation = await Location.findAll({ include: User });
     res.status(200).send(allLocation);
   } catch (e) {
     console.log("error", e);
@@ -43,7 +43,7 @@ router.patch("/location/:id", async (req, res) => {
   return res.status(200).send({ dislikes });
 });
 
-/* router.post("/locations", authMiddleware, async (req, res) => {
+router.post("/locations", authMiddleware, async (req, res) => {
   const { name, image, description, latitude, longtitude, experience } =
     req.body;
   const userId = req.user.id;
@@ -56,9 +56,10 @@ router.patch("/location/:id", async (req, res) => {
     latitude,
     longtitude,
     experience,
+    dislikes: 0,
   });
 
   return res.status(200).send({ newPost });
 });
- */
+
 module.exports = router;
