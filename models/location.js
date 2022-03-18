@@ -19,8 +19,8 @@ module.exports = (sequelize, DataTypes) => {
       image: DataTypes.STRING,
       dislikes: DataTypes.INTEGER,
       description: DataTypes.TEXT,
-      latitude: DataTypes.INTEGER,
-      longtitude: DataTypes.INTEGER,
+      latitude: DataTypes.DECIMAL,
+      longtitude: DataTypes.DECIMAL,
       experience: DataTypes.TEXT,
     },
     {
