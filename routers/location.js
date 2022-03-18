@@ -1,9 +1,11 @@
 const { Router } = require("express");
-const req = require("express/lib/request");
 const Location = require("../models/").location;
 const Comment = require("../models/").comment;
 const User = require("../models/").user;
+
 const authMiddleware = require("../auth/middleware");
+const { toData } = require("../auth/jwt");
+
 const router = new Router();
 
 router.get("/locations", async (req, res) => {
@@ -63,7 +65,7 @@ router.post("/locations", authMiddleware, async (req, res) => {
 });
 
 //POST COMMENT
-router.post("/comment", authMiddleware, async (req, res) => {
+router.post("/comments", authMiddleware, async (req, res) => {
   const authHeader = req.headers["authorization"];
   const { userId } = toData(authHeader.replace("Bearer ", ""));
   try {
@@ -86,6 +88,44 @@ router.post("/comment", authMiddleware, async (req, res) => {
     res.send(newComment);
   } catch (e) {
     console.log(e.message);
+  }
+});
+
+//GET COMMENTS
+router.get("/post/:id/comments", async (req, res) => {
+  const { id } = req.params;
+  const comments = await Comment.findAll({
+    where: { locationId: id },
+    order: [["createdAt", "DESC"]],
+  });
+  if (comments === null) {
+    return res.status(404).send(`Posts not found`);
+  }
+  return res.send(comments);
+});
+
+//DELETE ONE POST AS AN ADMIN
+router.delete("/delete/:id", authMiddleware, async (req, res, next) => {
+  const { id } = req.params;
+  const authHeader = req.headers["authorization"];
+  const { userId } = toData(authHeader.replace("Bearer ", ""));
+
+  try {
+    const oneUser = await User.findByPk(userId);
+
+    if (!oneUser) {
+      return res.status(404).send("User not found");
+    }
+
+    const location = await Location.findByPk(id);
+    if (!location) {
+      return res.status(404).send("Location not found");
+    }
+
+    await location.destroy();
+    return res.send({ success: true });
+  } catch (error) {
+    next(error);
   }
 });
 
